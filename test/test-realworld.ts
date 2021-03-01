@@ -38,6 +38,7 @@ const _addSortProperty = function (featCollection) {
 };
 
 describe("Real World Routes", function () {
+  if (!fs.existsSync("./test/data/out/")) fs.mkdirSync("./test/data/out/");
   for (const trail of testTrails) {
     for (const routability of ["routable", "unroutable"]) {
       let data, route;
