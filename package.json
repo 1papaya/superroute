@@ -2,7 +2,9 @@
   "name": "superroute",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "download-test-data": "ts-node-script ./test/download-test-data.ts",
