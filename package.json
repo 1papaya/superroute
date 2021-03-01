@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "download-test-data": "ts-node-script ./test/download-test-data.ts",
     "test": "mocha test/test-*.ts"
   },
   "author": "",
