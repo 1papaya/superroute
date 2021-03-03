@@ -58,13 +58,3 @@ export async function loadOverpass(
     return new OSMRouteData(data.elements, data.osm3s.timestamp_osm_base);
   });
 }
-
-export async function loadFile(path: string): Promise<OSMRouteData> {
-  // TODO check not in browser
-  return import("fs").then((fs) => {
-    return fs.promises.readFile(path, { encoding: "utf8" }).then((raw) => {
-      const data = JSON.parse(raw);
-      return new OSMRouteData(data.elements, data.osm3s.timestamp_osm_base);
-    });
-  });
-}

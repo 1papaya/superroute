@@ -37,6 +37,16 @@ const _addSortProperty = function (featCollection) {
   return dupeFeatCollection;
 };
 
+const loadFile = (path: string): Promise<sr.OSMRouteData> => {
+  // TODO check not in browser
+  return import("fs").then((fs) => {
+    return fs.promises.readFile(path, { encoding: "utf8" }).then((raw) => {
+      const data = JSON.parse(raw);
+      return new sr.OSMRouteData(data.elements, data.osm3s.timestamp_osm_base);
+    });
+  });
+};
+
 describe("Real World Routes", function () {
   if (!fs.existsSync("./test/data/out/")) fs.mkdirSync("./test/data/out/");
   for (const trail of testTrails) {
@@ -51,7 +61,7 @@ describe("Real World Routes", function () {
           const dataPath = `./test/data/${trail.name}-${routability}.json`;
 
           if (fs.existsSync(dataPath)) {
-            data = await sr.loadFile(
+            data = loadFile(
               `./test/data/${trail.name}-${routability}.json`
             );
             route = data.get(`r${trail.id}`);
