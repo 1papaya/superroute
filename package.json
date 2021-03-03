@@ -2,22 +2,25 @@
   "name": "superroute",
   "version": "0.2.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/superroute.js",
+  "browser": "dist/superroute.browser.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist/* && rollup -c && tsc -d --emitDeclarationOnly --declarationDir dist/",
     "download-test-data": "ts-node-script ./test/download-test-data.ts",
     "test": "mocha test/test-*.ts"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "overpass-ts": "^0.13.0"
+    "overpass-ts": "^4.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
     "@rollup/plugin-typescript": "^8.2.0",
     "@types/geojson": "^7946.0.7",
     "@types/mocha": "^8.2.0",
