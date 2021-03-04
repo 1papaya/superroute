@@ -740,5 +740,3 @@ describe("OSMSuperRoute", function () {
     });
   });
 });
-
-export {};
