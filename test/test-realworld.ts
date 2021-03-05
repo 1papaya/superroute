@@ -1,7 +1,7 @@
-const testTrails = require("./trails.ts").default;
-const sr = require("../src/index");
-const assert = require("assert");
-const fs = require("fs");
+import testTrails from "./trails";
+import * as sr from "../src/index";
+import * as fs from "fs";
+import * as assert from "assert";
 
 const anyRouteGetters = [
   "alternatives",
@@ -61,7 +61,7 @@ describe("Real World Routes", function () {
           const dataPath = `./test/data/${trail.name}-${routability}.json`;
 
           if (fs.existsSync(dataPath)) {
-            data = loadFile(
+            data = await loadFile(
               `./test/data/${trail.name}-${routability}.json`
             );
             route = data.get(`r${trail.id}`);

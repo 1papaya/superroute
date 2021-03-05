@@ -1,5 +1,6 @@
-const assert = require("assert");
-const sr = require("../src/index");
+import * as assert from "assert";
+import * as sr from "../src/index";
+import type { OverpassRelation, OverpassWay } from "overpass-ts";
 
 const validRouteData = {
   route: {
@@ -78,8 +79,8 @@ const validRouteData = {
 };
 
 const validData = new sr.OSMRouteData([
-  validRouteData.route,
-  ...validRouteData.ways,
+  validRouteData.route as OverpassRelation,
+  ...(validRouteData.ways as OverpassWay[]),
 ]);
 
 const validRoute = validData.allRoutes[0];
@@ -276,7 +277,7 @@ describe("OSMRoute", function () {
       invalidRouteData.route,
       ...invalidRouteData.ways,
     ]);
-    
+
     const invalidRoute = invalidData.allRoutes[0];
 
     it("should be not routable", function () {
@@ -392,3 +393,5 @@ describe("OSMRoute", function () {
     });
   });
 });
+
+export {};

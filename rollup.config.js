@@ -10,8 +10,11 @@ export default [
       name: "superroute",
       file: "dist/superroute.js",
       format: "umd",
+      globals: {
+        "overpass-ts": "overpass" 
+      }
     },
-    plugins: [typescript()],
+    plugins: [typescript({ module: "es2015" })],
   },
   {
     input: "src/index.ts",
@@ -25,7 +28,7 @@ export default [
         browser: true,
       }),
       commonjs(),
-      typescript(),
+      typescript({ module: "es2015" }),
     ],
   },
 ];

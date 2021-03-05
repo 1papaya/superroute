@@ -1,5 +1,7 @@
-const assert = require("assert");
-const sr = require("../src/index");
+import * as assert from "assert";
+import * as sr from "../src/index";
+
+import type {OverpassRelation, OverpassWay} from "overpass-ts";
 
 const validSuperrouteData = {
   superroute: {
@@ -176,9 +178,9 @@ const validSuperrouteData = {
 };
 
 const validRouteData = new sr.OSMRouteData([
-  validSuperrouteData.superroute,
-  ...validSuperrouteData.routes,
-  ...validSuperrouteData.ways,
+  validSuperrouteData.superroute as OverpassRelation,
+  ...(validSuperrouteData.routes as OverpassRelation[]),
+  ...(validSuperrouteData.ways as OverpassWay[]),
 ]);
 
 const validSuperroute = validRouteData.superRoutes[0];
@@ -740,3 +742,5 @@ describe("OSMSuperRoute", function () {
     });
   });
 });
+
+export {};

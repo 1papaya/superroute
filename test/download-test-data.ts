@@ -1,6 +1,6 @@
-const overpass = require("overpass-ts").default;
-const testTrails = require("./trails.ts").default;
-const fs = require("fs");
+import overpass from "overpass-ts";
+import testTrails from "./trails";
+import * as fs from "fs";
 
 const outDir = "./test/data";
 

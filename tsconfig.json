@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "allowJs": true,
     "moduleResolution": "node",
     "downlevelIteration": true,
     "declaration": true,
-    "target": "es2015",
-    "module": "es2015",
+    "target": "esnext",
+    "module": "commonjs",
     "outDir": "dist",
   },
   "exclude": ["node_modules", "dist", "test"],
