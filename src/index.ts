@@ -31,7 +31,9 @@ export async function loadId(
   id: number,
   overpassOpts = {}
 ): Promise<OSMRouteRelation> {
-  return loadIds([id]).then((data) => data.get(`r${id}`) as OSMRouteRelation);
+  return loadIds([id], overpassOpts).then(
+    (data) => data.get(`r${id}`) as OSMRouteRelation
+  );
 }
 
 export async function loadBbox(
