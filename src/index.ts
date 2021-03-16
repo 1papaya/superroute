@@ -1,7 +1,11 @@
-export { default as OSMRouteRelation, RouteTopologyError } from "./OSMRouteRelation";
+export {
+  default as OSMRouteRelation,
+  RouteTopologyError,
+} from "./OSMRouteRelation";
 export { default as OSMSuperRouteRelation } from "./OSMSuperRouteRelation";
 export { default as OSMRouteData } from "./OSMRouteData";
 
+import { default as OSMRouteRelation } from "./OSMRouteRelation";
 import { default as OSMRouteData } from "./OSMRouteData";
 import overpass, { OverpassJson } from "overpass-ts";
 
@@ -21,6 +25,13 @@ export async function loadIds(
               `.replace(/\n\s{12}/g, "\n");
 
   return loadOverpass(query, overpassOpts);
+}
+
+export async function loadId(
+  id: number,
+  overpassOpts = {}
+): Promise<OSMRouteRelation> {
+  return loadIds([id]).then((data) => data.get(`r${id}`) as OSMRouteRelation);
 }
 
 export async function loadBbox(
@@ -45,7 +56,7 @@ export async function loadBbox(
               .allroutes; way(r); out meta geom;
               .allroutes; node(r); out meta geom;
               `.replace(/\n\s{12}/g, "\n");
-              
+
   return loadOverpass(query, overpassOpts);
 }
 
