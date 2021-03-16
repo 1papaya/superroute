@@ -2,7 +2,6 @@
   "name": "superroute",
   "version": "0.0.3",
   "description": "",
-  "type": "module",
   "main": "dist/superroute.js",
   "browser": "dist/superroute.browser.js",
   "types": "dist/index.d.ts",
