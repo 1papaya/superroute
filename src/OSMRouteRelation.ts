@@ -19,6 +19,12 @@ export default class OSMRouteRelation extends OSMRelation {
     super(relation);
   }
 
+  _checkValidRoute(): void {
+    // check if has way and route relation members
+    const hasWays =
+      typeof this.members.find((m) => m["type"] === "way") === "undefined";
+  }
+
   /**
    * Build a graph from an array of members, using relation/way ID as
    * edge ID and node ID as node ID
@@ -253,19 +259,19 @@ export default class OSMRouteRelation extends OSMRelation {
   get orderedFeatureCollection(): GeoJSON.FeatureCollection {
     if (!this.isRoutable) throw new RouteTopologyError(this);
 
-    const membersMap = new Map(
-      this.members.map((member) => {
-        return [member.element.id, member];
+    const childrenMap = new Map(
+      this.children.map((child) => {
+        return [child.element.id, child];
       })
     );
 
     const featCollection = this.orderedChildIds.map((childId) => {
       return _isReversed(childId)
         ? reverseLineFeature(
-            (membersMap.get(_absoluteId(childId)).element as WayLikeMember)
+            (childrenMap.get(_absoluteId(childId)).element as WayLikeMember)
               .lineStringFeature
           )
-        : (membersMap.get(childId).element as WayLikeMember).lineStringFeature;
+        : (childrenMap.get(childId).element as WayLikeMember).lineStringFeature;
     });
 
     return {
