@@ -1,6 +1,8 @@
-import overpass from "overpass-ts";
-import testTrails from "./trails";
-import * as fs from "fs";
+const fs = require("fs");
+const testTrails = require("./trails").default;
+const overpass = require("overpass-ts");
+console.log(overpass);
+
 
 const outDir = "./test/data";
 
@@ -30,7 +32,7 @@ function sleep(ms) {
       [out:json][date:"${trail[`${routability}Date`]}"];
 
         relation(id:${trail.id}) -> .routes;
-       .routes; >>; rel(r)[type~"route|superroute"] -> .subroutes;
+       .routes; >>; rel(r) -> .subroutes;
 
        (.routes; .subroutes;) -> .allroutes;
 
