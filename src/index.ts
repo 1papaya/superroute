@@ -15,13 +15,13 @@ export async function loadIds(
 ): Promise<OSMRouteData> {
   const query = `[out:json];
               relation(id:${ids.join(",")}) -> .routes;
-              .routes; >>; rel(r)[type~"route|superroute"] -> .subroutes;
+              .routes; >>; rel(r) -> .subrelations;
   
-              (.routes; .subroutes;) -> .allroutes;
+              (.routes; .subrelations;) -> .allrelations;
   
-              .allroutes out meta;
-              .allroutes; way(r); out meta geom;
-              .allroutes; node(r); out meta geom;
+              .allrelations out meta;
+              .allrelations; way(r); out meta geom;
+              .allrelations; node(r); out meta geom;
               `.replace(/\n\s{12}/g, "\n");
 
   return loadOverpass(query, overpassOpts);

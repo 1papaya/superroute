@@ -9,11 +9,14 @@ export default class OSMSuperRouteRelation extends OSMRouteRelation {
   }
 
   /**
-   * OSMSuperRouteRelation children: member relations
+   * OSMSuperRouteRelation children: member relations with type route/superroute
    */
   get children(): OSMRelationMember[] {
     return this.members.filter(
-      (member) => member.type === "relation" && "element" in member
+      (member) =>
+        member.type === "relation" &&
+        "element" in member &&
+        ["route", "superroute"].includes(member.element.tags["type"])
     );
   }
 

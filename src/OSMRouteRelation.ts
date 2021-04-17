@@ -18,13 +18,7 @@ export default class OSMRouteRelation extends OSMRelation {
   constructor(relation: OverpassRelation) {
     super(relation);
   }
-
-  _checkValidRoute(): void {
-    // check if has way and route relation members
-    const hasWays =
-      typeof this.members.find((m) => m["type"] === "way") === "undefined";
-  }
-
+  
   /**
    * Build a graph from an array of members, using relation/way ID as
    * edge ID and node ID as node ID
@@ -357,7 +351,7 @@ export default class OSMRouteRelation extends OSMRelation {
 
 export class RouteTopologyError extends Error {
   errNodes: number[];
-  routeId: string;
+  route: OSMRouteRelation;
 
   constructor(route: OSMRouteRelation | OSMSuperRouteRelation) {
     const nodeDegrees = route.nodeDegrees;
@@ -382,12 +376,15 @@ export class RouteTopologyError extends Error {
       `${route.id} (${route.tags["name"]}) is not routable: ${err.join(",")}`
     );
 
-    this.routeId = route.id;
+    this.route = route;
     this.errNodes = errNodes;
   }
 }
 
 export class SuperRouteTopologyError extends Error {
+  route: OSMRouteRelation;
+  errors: RouteTopologyError[];
+
   constructor(route: OSMRouteRelation, errors: RouteTopologyError[]) {
     const subErrorMessages = errors.map((err) =>
       err.message.split("\n").join("\n  ")
@@ -399,5 +396,8 @@ export class SuperRouteTopologyError extends Error {
     ];
 
     super(errLines.join("\n  "));
+
+    this.route = route;
+    this.errors = errors;
   }
 }
