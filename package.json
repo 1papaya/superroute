@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "overpass-ts": "^4.2.0"
+    "overpass-ts": "^4.2.4"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.1.0",

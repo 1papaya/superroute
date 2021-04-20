@@ -7,7 +7,7 @@ export { default as OSMRouteData } from "./OSMRouteData";
 
 import { default as OSMRouteRelation } from "./OSMRouteRelation";
 import { default as OSMRouteData } from "./OSMRouteData";
-import overpass, { OverpassJson } from "overpass-ts";
+import { overpass, OverpassJson } from "overpass-ts";
 
 export async function loadIds(
   ids: number[] = [],
