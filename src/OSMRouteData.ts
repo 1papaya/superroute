@@ -3,6 +3,7 @@ import type {
   OverpassWay,
   OverpassNode,
   OverpassRelation,
+  OverpassJson,
 } from "overpass-ts";
 import type { ZFactory } from "z-factory";
 
@@ -152,38 +153,48 @@ export default class OSMRouteData extends Map<
     );
   }
 
-  toJson(): Array<OverpassWay | OverpassRelation> {
+  toJson(): OverpassJson {
     const sortedElIds = Array.from(this.keys()).sort();
 
-    return sortedElIds.map((elId) => {
-      let el = this.get(elId);
+    return {
+      version: 0.6,
+      generator: "superroute via overpass api",
+      osm3s: {
+        timestamp_osm_base: this.timestamp,
+        copyright:
+          "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+      },
+      elements: sortedElIds.map((elId) => {
+        let el = this.get(elId);
 
-      const obj = {
-        type: el.type,
-        id: parseInt(el.id.slice(1)),
-      };
+        const obj = {
+          type: el.type,
+          id: parseInt(el.id.slice(1)),
+        };
 
-      // copy over meta tags
-      for (const tag of META_TAGS) if (tag in el.meta) obj[tag] = el.meta[tag];
+        // copy over meta tags
+        for (const tag of META_TAGS)
+          if (tag in el.meta) obj[tag] = el.meta[tag];
 
-      if (el.type === "way") {
-        el = el as OSMWay;
-        obj["nodes"] = [el.nodes[0], el.nodes[el.nodes.length-1];
-        obj["geometry"] = el.geometry;
-        obj["tags"] = el.tags;
+        if (el.type === "way") {
+          el = el as OSMWay;
+          obj["nodes"] = [el.nodes[0], el.nodes[el.nodes.length - 1]];
+          obj["geometry"] = el.geometry;
+          obj["tags"] = el.tags;
 
-        return obj as OverpassWay;
-      } else if (el.type === "relation") {
-        el = el as OSMRouteRelation;
+          return obj as OverpassWay;
+        } else if (el.type === "relation") {
+          el = el as OSMRouteRelation;
 
-        obj["members"] = el.members.map((member) => ({
-          type: member.type,
-          ref: member.ref,
-          role: member.role,
-        }));
+          obj["members"] = el.members.map((member) => ({
+            type: member.type,
+            ref: member.ref,
+            role: member.role,
+          }));
 
-        return obj as OverpassRelation;
-      }
-    });
+          return obj as OverpassRelation;
+        }
+      }),
+    };
   }
 }
