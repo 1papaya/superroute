@@ -54,6 +54,7 @@ export default class OSMRouteData extends Map<
     relations
       .filter(
         (el) =>
+          "type" in el.tags &&
           el.tags["type"] === "route" &&
           !!el.members.find(
             (m) => m["type"] === "relation" && m["role"] !== "alternative"
@@ -74,6 +75,7 @@ export default class OSMRouteData extends Map<
     // at least one subrelation which is not an alternative
     const superRoutes = relations.filter(
       (el) =>
+        "type" in el.tags &&
         (el.tags["type"] === "route" || el.tags["type"] === "superroute") &&
         !!el.members.find(
           (m) => m["type"] === "relation" && m["role"] !== "alternative"
