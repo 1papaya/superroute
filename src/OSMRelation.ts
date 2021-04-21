@@ -28,10 +28,14 @@ export default class OSMRelation extends OSMElement {
   }
 
   addRef(member: OSMRelationMember, cache: OSMRouteData): void {
-    const memberId = `${member.type.slice(0,1)}${member.ref}`;
+    const memberId = `${member.type.slice(0, 1)}${member.ref}`;
 
     if (cache.has(memberId)) member.element = cache.get(memberId);
-    else console.log(`${this.id}: member ${memberId} not found in cache`);
+    else {
+      // ignore node errors
+      if (member.type !== "node")
+        console.log(`${this.id}: member ${memberId} not found in cache`);
+    }
   }
 
   addParent(relation: OSMRelationMember): void {
