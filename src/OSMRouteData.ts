@@ -153,6 +153,8 @@ export default class OSMRouteData extends Map<
     );
   }
 
+  addStatsMetadataToWays(): void {}
+
   toJson(): OverpassJson {
     const sortedElIds = Array.from(this.keys()).sort();
 
@@ -191,6 +193,8 @@ export default class OSMRouteData extends Map<
             ref: member.ref,
             role: member.role,
           }));
+
+          obj["tags"] = el.tags;
 
           return obj as OverpassRelation;
         }
