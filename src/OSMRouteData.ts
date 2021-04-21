@@ -4,7 +4,9 @@ import type {
   OverpassNode,
   OverpassRelation,
 } from "overpass-ts";
+import type { ZFactory } from "z-factory";
 
+import { META_TAGS } from "./OSMElement";
 import OSMSuperRouteRelation from "./OSMSuperRouteRelation";
 import OSMRouteRelation from "./OSMRouteRelation";
 import OSMNode from "./OSMNode";
@@ -88,7 +90,7 @@ export default class OSMRouteData extends Map<
       overpassSuperRoute.members
         .filter((m) => m.type === "relation")
         .forEach((m) => {
-          const memberId = `${m.type.slice(0,1)}${m.ref}`;
+          const memberId = `${m.type.slice(0, 1)}${m.ref}`;
           // if member doesn't exist in data, nothing to do here...
           if (!this.has(memberId)) return;
 
@@ -130,5 +132,58 @@ export default class OSMRouteData extends Map<
     return Array.from(this.values()).filter(
       (element) => element instanceof OSMSuperRouteRelation
     ) as OSMSuperRouteRelation[];
+  }
+
+  async addElevation(zFactory: ZFactory, zoomLevel = 11): Promise<unknown> {
+    return Promise.all(
+      Array.from(this.values()).map((el: OSMWay) => {
+        if (el.type !== "way") return new Promise((res) => res(null));
+
+        return Promise.all(
+          el.geometry.map((coord, coordIdx) =>
+            zFactory.getZ([coord.lon, coord.lat], zoomLevel).then((ele) => {
+              el.geometry[coordIdx] = Object.assign({}, el.geometry[coordIdx], {
+                z: Math.round(ele * 10) / 10,
+              });
+            })
+          )
+        );
+      })
+    );
+  }
+
+  toJson(): Array<OverpassWay | OverpassRelation> {
+    const sortedElIds = Array.from(this.keys()).sort();
+
+    return sortedElIds.map((elId) => {
+      let el = this.get(elId);
+
+      const obj = {
+        type: el.type,
+        id: parseInt(el.id.slice(1)),
+      };
+
+      // copy over meta tags
+      for (const tag of META_TAGS) if (tag in el.meta) obj[tag] = el.meta[tag];
+
+      if (el.type === "way") {
+        el = el as OSMWay;
+        obj["nodes"] = [el.nodes[0], el.nodes[el.nodes.length-1];
+        obj["geometry"] = el.geometry;
+        obj["tags"] = el.tags;
+
+        return obj as OverpassWay;
+      } else if (el.type === "relation") {
+        el = el as OSMRouteRelation;
+
+        obj["members"] = el.members.map((member) => ({
+          type: member.type,
+          ref: member.ref,
+          role: member.role,
+        }));
+
+        return obj as OverpassRelation;
+      }
+    });
   }
 }

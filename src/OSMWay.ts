@@ -4,7 +4,7 @@ import OSMElement from "./OSMElement";
 export default class OSMWay extends OSMElement {
   type: "way";
   nodes: number[];
-  geometry: { lon: number; lat: number; ele?: number }[];
+  geometry: { lon: number; lat: number; z?: number }[];
 
   constructor(way: OverpassWay) {
     super(way);
@@ -40,8 +40,8 @@ export default class OSMWay extends OSMElement {
   }
 
   get coords(): number[][] {
-    if ("ele" in this.geometry[0])
-      return this.geometry.map((geom) => [geom.lon, geom.lat, geom.ele]);
+    if ("z" in this.geometry[0])
+      return this.geometry.map((geom) => [geom.lon, geom.lat, geom.z]);
     else return this.geometry.map((geom) => [geom.lon, geom.lat]);
   }
 }

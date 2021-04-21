@@ -1,6 +1,6 @@
 import type { OverpassOsmElement } from "overpass-ts";
 
-const META_TAGS = ["changeset", "timestamp", "uid", "user", "version"];
+export const META_TAGS = ["timestamp", "version", "changeset", "user", "uid"];
 
 export default class OSMElement {
   id: string;
@@ -9,7 +9,7 @@ export default class OSMElement {
   meta: { [key: string]: string | number };
 
   constructor(element: OverpassOsmElement) {
-    this.id = `${element.type.slice(0,1)}${element.id}`;
+    this.id = `${element.type.slice(0, 1)}${element.id}`;
     this.tags = element.tags;
     this.type = element.type;
 
