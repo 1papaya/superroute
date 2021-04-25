@@ -12,17 +12,22 @@ export default [
       format: "umd",
       globals: {
         "overpass-ts": "overpass",
-        "@turf/length": "turfLength"
-      }
+        "@turf/length": "turfLength",
+      },
     },
     plugins: [typescript({ module: "es2015" })],
   },
   {
     input: "src/index.ts",
+    external: ["overpass-ts", "@turf/length"],
     output: {
       name: "superroute",
       file: "dist/superroute.browser.js",
       format: "umd",
+      globals: {
+        "overpass-ts": "overpass",
+        "@turf/length": "turfLength",
+      },
     },
     plugins: [
       nodeResolve({
