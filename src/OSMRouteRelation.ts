@@ -389,7 +389,7 @@ export default class OSMRouteRelation extends OSMRelation {
       // surface=* stats
       if ("surface" in segment.properties)
         statistics.surfacePct += 1 / statistics.numSegments;
-      else statistics.surfaceWays.push(segment.properties.id);
+      else statistics.surfaceWays.push(segment.properties["@id"]);
 
       // sac_scale=* stats
       // only include path track and footway in calculations
@@ -400,11 +400,11 @@ export default class OSMRouteRelation extends OSMRelation {
         numSacScaleRelevant += 1;
 
         if ("sac_scale" in segment.properties) numSacScale += 1;
-        else statistics.sacScaleWays.push(segment.properties.id);
+        else statistics.sacScaleWays.push(segment.properties["@id"]);
       }
 
       // length
-      statistics.length += turfLength(segment);
+      statistics.length += turfLength(segment) * 1000;
     });
 
     statistics["sacScalePct"] = numSacScale / numSacScaleRelevant;
@@ -430,6 +430,13 @@ export default class OSMRouteRelation extends OSMRelation {
         });
       }
     }
+    const round = (number) => Math.round(number * 100) / 100
+
+    statistics["surfacePct"] = round(statistics["surfacePct"]) * 100;
+    statistics["sacScalePct"] = round(statistics["sacScalePct"]) * 100;
+    statistics["length"] = round(statistics["length"]);
+    statistics["ascent"] = round(statistics["ascent"]);
+    statistics["descent"] = round(statistics["descent"]);
 
     this._statistics = statistics;
     return this._statistics;
