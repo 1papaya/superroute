@@ -3,9 +3,23 @@ import type { OverpassRelation } from "overpass-ts";
 
 import OSMSuperRouteRelation from "./OSMSuperRouteRelation";
 import OSMRelation from "./OSMRelation";
+import turfLength from "@turf/length";
 import OSMWay from "./OSMWay";
 
 import { _isReversed, _absoluteId, reverseLineFeature } from "./utils";
+
+type RouteStatistics = {
+  numSegments: number;
+  numNodes: number;
+  length: number;
+  surfacePct: number;
+  surfaceWays: string[];
+  sacScalePct: number;
+  sacScaleWays: string[];
+
+  ascent?: number;
+  descent?: number;
+};
 
 type RouteGraph = Map<string, Map<string, string>>;
 type WayLikeMember = OSMWay | OSMRouteRelation | OSMSuperRouteRelation;
@@ -13,12 +27,13 @@ type WayLikeMember = OSMWay | OSMRouteRelation | OSMSuperRouteRelation;
 export default class OSMRouteRelation extends OSMRelation {
   _orderedChildIds: string[];
   _routeGraph: RouteGraph;
+  _statistics: RouteStatistics;
   _isRoutable: boolean;
 
   constructor(relation: OverpassRelation) {
     super(relation);
   }
-  
+
   /**
    * Build a graph from an array of members, using relation/way ID as
    * edge ID and node ID as node ID
@@ -250,7 +265,7 @@ export default class OSMRouteRelation extends OSMRelation {
   /**
    * Get ordered GeoJSON FeatureCollection of all relation children
    */
-  get orderedFeatureCollection(): GeoJSON.FeatureCollection {
+  get orderedFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     if (!this.isRoutable) throw new RouteTopologyError(this);
 
     const childrenMap = new Map(
@@ -270,18 +285,18 @@ export default class OSMRouteRelation extends OSMRelation {
 
     return {
       type: "FeatureCollection",
-      features: featCollection,
+      features: featCollection as GeoJSON.Feature<GeoJSON.LineString>[],
     };
   }
 
-  get deepOrderedFeatureCollection(): GeoJSON.FeatureCollection {
+  get deepOrderedFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     return this.orderedFeatureCollection;
   }
 
   /**
    * Return a GeoJSON FeatureCollection of all route children
    */
-  get featureCollection(): GeoJSON.FeatureCollection {
+  get featureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     return {
       type: "FeatureCollection",
       features: this.children
@@ -290,7 +305,7 @@ export default class OSMRouteRelation extends OSMRelation {
     };
   }
 
-  get deepFeatureCollection(): GeoJSON.FeatureCollection {
+  get deepFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     return this.featureCollection;
   }
 
@@ -346,6 +361,78 @@ export default class OSMRouteRelation extends OSMRelation {
     return this.isRoutable
       ? this.lineStringFeature
       : this.deepMultiLineStringFeature;
+  }
+
+  get statistics(): RouteStatistics {
+    if (typeof this._statistics !== "undefined") return this._statistics;
+
+    const deepFeatureCollection = this.deepFeatureCollection;
+
+    const statistics = {
+      numSegments: 0,
+      numNodes: 0,
+      surfacePct: 0,
+      surfaceWays: [],
+      sacScalePct: 0,
+      sacScaleWays: [],
+      length: 0,
+    };
+
+    let numSacScaleRelevant = 0;
+    let numSacScale = 0;
+
+    deepFeatureCollection.features.forEach((segment) => {
+      // numSegments numNodes
+      statistics["numSegments"] += 1;
+      statistics["numNodes"] += segment.geometry.coordinates.length;
+
+      // surface=* stats
+      if ("surface" in segment.properties)
+        statistics.surfacePct += 1 / statistics.numSegments;
+      else statistics.surfaceWays.push(segment.properties.id);
+
+      // sac_scale=* stats
+      // only include path track and footway in calculations
+      if (
+        "highway" in segment.properties &&
+        ["path", "track", "footway"].includes(segment.properties.highway)
+      ) {
+        numSacScaleRelevant += 1;
+
+        if ("sac_scale" in segment.properties) numSacScale += 1;
+        else statistics.sacScaleWays.push(segment.properties.id);
+      }
+
+      // length
+      statistics.length += turfLength(segment);
+    });
+
+    statistics["sacScalePct"] = numSacScale / numSacScaleRelevant;
+
+    // calculate ascent/descent if route is routable and 3d
+    if (this.isRoutable) {
+      const lineStringCoords = this.lineStringFeature.geometry.coordinates;
+
+      if (lineStringCoords[0].length === 3) {
+        statistics["ascent"] = 0;
+        statistics["descent"] = 0;
+
+        lineStringCoords.forEach((coord, coordIdx) => {
+          if (coordIdx !== 0) {
+            const lastCoord = lineStringCoords[coordIdx - 1];
+
+            // elevation gain
+            if (coord[2] > lastCoord[2])
+              statistics["ascent"] += coord[2] - lastCoord[2];
+            else if (coord[2] < lastCoord[2])
+              statistics["descent"] += lastCoord[2] - coord[2];
+          }
+        });
+      }
+    }
+
+    this._statistics = statistics;
+    return this._statistics;
   }
 }
 

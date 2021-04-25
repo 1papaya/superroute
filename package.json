@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@turf/length": "^6.3.0",
     "overpass-ts": "^4.2.4"
   },
   "devDependencies": {

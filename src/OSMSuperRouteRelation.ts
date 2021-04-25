@@ -51,7 +51,7 @@ export default class OSMSuperRouteRelation extends OSMRouteRelation {
    * Return ordered GeoJSON FeatureCollection of all child OSMWays
    * Will throw a TopologyError if any child is not routable
    */
-  get deepOrderedFeatureCollection(): GeoJSON.FeatureCollection {
+  get deepOrderedFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     const feats = [];
 
     if (!this.isRoutable) throw new RouteTopologyError(this);
@@ -81,7 +81,7 @@ export default class OSMSuperRouteRelation extends OSMRouteRelation {
   /**
    * Return GeoJSON FeatureCollection of all child OSMWays
    */
-  get deepFeatureCollection(): GeoJSON.FeatureCollection {
+  get deepFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     const feats = [];
 
     this.children.forEach((child) => {
@@ -123,7 +123,7 @@ export default class OSMSuperRouteRelation extends OSMRouteRelation {
     return super.multiLineStringFeature;
   }
 
-  get featureCollection(): GeoJSON.FeatureCollection {
+  get featureCollection(): GeoJSON.FeatureCollection<GeoJSON.LineString> {
     if (!this.isRoutable) throw new RouteTopologyError(this);
     return super.featureCollection;
   }

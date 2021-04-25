@@ -5,13 +5,14 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 export default [
   {
     input: "src/index.ts",
-    external: ["overpass-ts"],
+    external: ["overpass-ts", "@turf/length"],
     output: {
       name: "superroute",
       file: "dist/superroute.js",
       format: "umd",
       globals: {
-        "overpass-ts": "overpass" 
+        "overpass-ts": "overpass",
+        "@turf/length": "turfLength"
       }
     },
     plugins: [typescript({ module: "es2015" })],
